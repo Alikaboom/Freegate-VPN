@@ -100,16 +100,10 @@
                                         </div>
                                     `;
 
-                                    linksHtml += addLink('Raw VLESS Link (Starter)', baseConfigUrl + '?format=raw');
+                                    linksHtml += addLink('Raw VLESS Link', baseConfigUrl + '?format=raw');
                                     
                                     if (['Standard', 'Advanced', 'Complete'].includes(productName)) {
-                                        linksHtml += addLink('Base64 Subscription (Standard)', baseConfigUrl + '?format=b64');
-                                    }
-                                    if (['Advanced', 'Complete'].includes(productName)) {
-                                        linksHtml += addLink('Sing-box JSON (Advanced)', baseConfigUrl + '?format=singbox');
-                                    }
-                                    if (['Complete'].includes(productName)) {
-                                        linksHtml += addLink('Clash Meta YAML (Complete)', baseConfigUrl + '?format=clash');
+                                        linksHtml += addLink('Base64 Subscription', baseConfigUrl + '?format=b64');
                                     }
                                     
                                     return linksHtml;
