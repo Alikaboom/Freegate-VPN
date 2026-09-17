@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order History - Freegate VPN</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <h1>Freegate VPN</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#products-section">Products</a></li>
+                    <li><a href="history.html">Order History</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 0; min-height: 70vh;">
+        <h2 style="margin-bottom: 2rem; color: #2c3e50;">Your Subscriptions</h2>
+        
+        <div id="orders-container">
+            <p class="loading-text">Loading your order history...</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Freegate VPN - Final Project B204.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const ordersContainer = document.getElementById('orders-container');
+
+            try {
+                const response = await fetch('/api/orders');
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                
+                const orders = await response.json();
+                
+                if (orders.length === 0) {
+                    ordersContainer.innerHTML = `
+                        <div class="product-card" style="text-align: center;">
+                            <p>You haven't purchased any VPN plans yet.</p>
+                            <a href="index.html#products-section" class="btn" style="margin-top: 1rem;">View Plans</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                ordersContainer.innerHTML = ''; // Clear loading
+
+                orders.forEach(order => {
+                    // Extract the UUID from the VLESS link to construct a realistic BPB Subscription URL
+                    const uuidMatch = order.vpnConfigUrl.match(/vless:\/\/([^@]+)@/);
+                    const uuid = uuidMatch ? uuidMatch[1] : 'unknown-id';
+                    const subLink = `https://us1.freegate-nodes.com/sub/${uuid}`;
+                    
+                    const date = new Date(order.createdAt).toLocaleDateString();
+
+                    const card = document.createElement('div');
+                    card.className = 'product-card order-card';
+                    card.style.textAlign = 'left';
+                    card.style.marginBottom = '2rem';
+                    card.style.display = 'grid';
+                    card.style.gap = '1.5rem';
+                    
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 1rem;">
+                            <h3>${order.productId ? order.productId.name : 'Legacy Plan'}</h3>
+                            <span style="background: #27ae60; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem;">Active</span>
+                        </div>
+                        
+                        <div>
+                            <p><strong>Order ID:</strong> ${order.paypalOrderId}</p>
+                            <p><strong>Purchased:</strong> ${date}</p>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border: 1px solid #e9ecef;">
+                            <h4 style="margin-bottom: 1rem; color: #34495e;">Your Subscription Link</h4>
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                <input type="text" readonly value="${subLink}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
+                                <button class="btn" onclick="navigator.clipboard.writeText('${subLink}'); alert('Copied to clipboard!')">Copy</button>
+                            </div>
+                            
+                            <h4 style="margin-bottom: 0.5rem; color: #34495e;">Recommended Client Settings</h4>
+                            <ul style="list-style: none; padding: 0; font-size: 0.9rem; color: #555;">
+                                <li><strong>Clean IP:</strong> Use a tested Cloudflare Proxy IP to bypass SNI filtering.</li>
+                                <li><strong>Fragmentation:</strong> Set length to <code>10-20</code> and interval to <code>10-30</code> in v2rayNG/Nekobox for optimal DPI evasion.</li>
+                            </ul>
+                        </div>
+                    `;
+                    ordersContainer.appendChild(card);
+                });
+
+            } catch (err) {
+                ordersContainer.innerHTML = '<p class="error">Error loading order history. Please try again later.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
