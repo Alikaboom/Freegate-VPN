@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
 
-// GET all orders for the dummy user
 router.get('/', async (req, res) => {
     try {
-        // In a real app with auth, we would filter by req.user.email
-        // For this assessment, we fetch the dummy buyer's orders
+        // In a real app with auth, I would filter by req.user.email
+        // For this assessment, I fetch the dummy buyer's orders
         const orders = await Order.find({ customerEmail: 'test-buyer@sandbox.paypal.com' })
                                   .populate('productId')
                                   .sort({ createdAt: -1 });
