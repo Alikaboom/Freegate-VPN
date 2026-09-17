@@ -13,11 +13,13 @@ const productRoutes = require('./routes/productRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const subRoutes = require('./routes/subRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 app.use('/api/products', productRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/sub', subRoutes);
+app.use('/api/admin', adminRoutes);
 
 const connectDB = async () => {
     try {

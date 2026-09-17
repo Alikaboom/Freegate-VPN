@@ -54,8 +54,55 @@
             </form>
             <p id="status-msg" style="margin-top: 1rem; font-weight: bold;"></p>
         </div>
+        <h2 style="margin-top: 3rem; margin-bottom: 2rem; color: #2c3e50; border-top: 2px solid #eee; padding-top: 2rem;">Database Console (Advanced)</h2>
+        <div class="product-card" style="text-align: left;">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="font-weight: bold; margin-bottom: 0.5rem; display: block;">Collection</label>
+                    <input type="text" id="db-col" value="orders" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div>
+                    <label style="font-weight: bold; margin-bottom: 0.5rem; display: block;">Method</label>
+                    <select id="db-method" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="find">find</option>
+                        <option value="deleteMany">deleteMany</option>
+                        <option value="count">countDocuments</option>
+                        <option value="drop">drop</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-weight: bold; margin-bottom: 0.5rem; display: block;">Query Filter (JSON)</label>
+                    <textarea id="db-filter" rows="3" placeholder='{"status": "completed"}' style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;"></textarea>
+                </div>
+                <button type="button" id="run-db-btn" class="btn" style="background-color: #c0392b;">Execute Query</button>
+            </div>
+            <pre id="db-output" style="margin-top: 1rem; padding: 1rem; background: #2c3e50; color: #ecf0f1; border-radius: 4px; overflow-x: auto; max-height: 300px;">Ready...</pre>
+        </div>
     </main>
     <script>
+        document.getElementById('run-db-btn').addEventListener('click', async () => {
+            const out = document.getElementById('db-output');
+            out.textContent = 'Executing...';
+            try {
+                const filterText = document.getElementById('db-filter').value;
+                if (filterText.trim()) JSON.parse(filterText);
+                
+                const res = await fetch('/api/admin/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        collection: document.getElementById('db-col').value,
+                        method: document.getElementById('db-method').value,
+                        filter: filterText
+                    })
+                });
+                const data = await res.json();
+                out.textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                out.textContent = 'Error: ' + err.message;
+            }
+        });
+        
         const pin = prompt("Enter Admin PIN to access this page:");
         if (pin !== "1234") {
             alert("Unauthorized access.");
