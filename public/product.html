@@ -6,7 +6,7 @@
     <title>Plan Details - Freegate VPN</title>
     <link rel="stylesheet" href="style.css">
     <!-- Load PayPal Sandbox SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ARMFC2UC_679X8VGp75J5bzs5MKvfjbvP-Xd9dkFjBsEapF2jeWLi2Sw84nz1JFWaRvKTlU192n1_PZa&currency=USD"></script>
 </head>
 <body>
     <header>
@@ -89,18 +89,31 @@
                         const res = await fetch('/api/payments/capture-paypal-order', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ orderID: details.id })
+                            body: JSON.stringify({ 
+                                orderID: details.id,
+                                productId: product._id
+                            })
                         });
                         const captureResult = await res.json();
 
                         if (captureResult.status === 'COMPLETED') {
                             document.getElementById('paypal-button-container').style.display = 'none';
-                            document.getElementById('payment-success').style.display = 'block';
                             
-                            // Redirect to history page after 3 seconds
+                            const successDiv = document.getElementById('payment-success');
+                            successDiv.style.display = 'block';
+                            successDiv.innerHTML = `
+                                Payment Successful! Your VPN has been provisioned.<br><br>
+                                <strong style="color: #333;">Your VLESS Config URI:</strong><br>
+                                <code style="display: block; padding: 10px; background: #f4f4f4; border: 1px solid #ddd; margin-top: 10px; word-break: break-all; color: #2c3e50;">
+                                    ${captureResult.configUrl}
+                                </code>
+                                <br><small>Redirecting to your Order History...</small>
+                            `;
+                            
+                            // Redirect to history page after 6 seconds so they can read it
                             setTimeout(() => {
                                 window.location.href = 'history.html';
-                            }, 3000);
+                            }, 6000);
                         }
                     }
                 }).render('#paypal-button-container');

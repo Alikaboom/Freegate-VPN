@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+const crypto = require('crypto');
+const Order = require('../models/Order');
+
 // Route to create a dummy PayPal order
 router.post('/create-paypal-order', async (req, res) => {
     try {
@@ -16,23 +19,40 @@ router.post('/create-paypal-order', async (req, res) => {
     }
 });
 
-// Route to capture a dummy PayPal order
+// Route to capture order and provision VPN
 router.post('/capture-paypal-order', async (req, res) => {
     try {
-        const { orderID } = req.body;
+        const { orderID, productId } = req.body;
         
-        // Simulate successful capture
-        const mockCaptureResponse = {
+        const customerEmail = 'test-buyer@sandbox.paypal.com';
+
+        // Generate a unique UUID for the BPB-Worker-Panel config
+        const vpnUuid = crypto.randomUUID();
+        
+        // Construct the VLESS link for the user
+        const vpnConfig = `vless://${vpnUuid}@us1.freegate-nodes.com:443?encryption=none&security=tls&type=ws&host=us1.freegate-nodes.com&path=%2F#Freegate-${orderID.substring(0,6)}`;
+
+        // Sync with Cloudflare KV (BPB Panel backend)
+        // Note: Using a console mock here until real CF API keys are provided
+        console.log(`[CF-KV] Synced UUID ${vpnUuid} for Order ${orderID}`);
+
+        // Save order and config to database
+        const newOrder = new Order({
+            paypalOrderId: orderID,
+            productId: productId,
+            customerEmail: customerEmail,
+            vpnConfigUrl: vpnConfig
+        });
+
+        await newOrder.save();
+        
+        res.status(200).json({
             id: orderID,
             status: 'COMPLETED',
-            payer: {
-                email_address: 'test-buyer@sandbox.paypal.com'
-            }
-        };
-
-        res.status(200).json(mockCaptureResponse);
+            configUrl: vpnConfig
+        });
     } catch (err) {
-        console.error('Error capturing PayPal order:', err);
+        console.error('Error provisioning VPN:', err);
         res.status(500).json({ error: 'Server error while capturing order' });
     }
 });
