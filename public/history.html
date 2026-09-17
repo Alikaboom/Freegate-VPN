@@ -57,13 +57,14 @@
                 ordersContainer.innerHTML = '';
 
                 orders.forEach(order => {
-                    const uuidMatch = order.vpnConfigUrl.match(/vless:\/\/([^@]+)@/);
-                    const uuid = uuidMatch ? uuidMatch[1] : 'unknown-id';
+                    let baseConfigUrl = order.vpnConfigUrl;
                     
-                    // The real local URL for testing
-                    const realSubLink = `http://localhost:5000/sub/${uuid}`;
-                    // The fake realistic URL for screenshots/report
-                    const fakeDisplayLink = `https://bpb-panel.freegate-vpn.workers.dev/sub/${uuid}?name=FreegateVPN`;
+                    // Fallback for older orders that still have the legacy vless:// string
+                    if (baseConfigUrl.startsWith('vless://')) {
+                        const uuidMatch = baseConfigUrl.match(/vless:\/\/([^@]+)@/);
+                        const uuid = uuidMatch ? uuidMatch[1] : 'unknown-id';
+                        baseConfigUrl = `http://localhost:5000/sub/${uuid}`;
+                    }
                     
                     const date = new Date(order.createdAt).toLocaleDateString();
 
@@ -91,24 +92,24 @@
                                     let linksHtml = '';
                                     const productName = order.productId ? order.productId.name : 'Legacy Plan';
                                     
-                                    const addLink = (title, displayUrl, realUrl) => `
-                                        <h4 style="margin-bottom: 0.5rem; color: #34495e; font-size: 0.9rem;">${title}</h4>
+                                    const addLink = (title, url) => \`
+                                        <h4 style="margin-bottom: 0.5rem; color: #34495e; font-size: 0.9rem;">\${title}</h4>
                                         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                                            <input type="text" readonly value="${displayUrl}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
-                                            <button class="btn" onclick="navigator.clipboard.writeText('${realUrl}'); alert('Copied to clipboard!')">Copy</button>
+                                            <input type="text" readonly value="\${url}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
+                                            <button class="btn" onclick="navigator.clipboard.writeText('\${url}'); alert('Copied to clipboard!')">Copy</button>
                                         </div>
-                                    `;
+                                    \`;
 
-                                    linksHtml += addLink('Raw VLESS Link (Starter)', fakeDisplayLink + '&type=raw', realSubLink + '?type=raw');
+                                    linksHtml += addLink('Raw VLESS Link (Starter)', baseConfigUrl + '?format=raw');
                                     
                                     if (['Standard', 'Advanced', 'Complete'].includes(productName)) {
-                                        linksHtml += addLink('Base64 Subscription (Standard)', fakeDisplayLink + '&type=b64', realSubLink + '?type=b64');
+                                        linksHtml += addLink('Base64 Subscription (Standard)', baseConfigUrl + '?format=b64');
                                     }
                                     if (['Advanced', 'Complete'].includes(productName)) {
-                                        linksHtml += addLink('Sing-box JSON (Advanced)', fakeDisplayLink + '&type=singbox', realSubLink + '?type=singbox');
+                                        linksHtml += addLink('Sing-box JSON (Advanced)', baseConfigUrl + '?format=singbox');
                                     }
                                     if (['Complete'].includes(productName)) {
-                                        linksHtml += addLink('Clash Meta YAML (Complete)', fakeDisplayLink + '&type=clash', realSubLink + '?type=clash');
+                                        linksHtml += addLink('Clash Meta YAML (Complete)', baseConfigUrl + '?format=clash');
                                     }
                                     
                                     return linksHtml;
