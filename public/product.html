@@ -72,9 +72,7 @@
                         });
                         const orderData = await res.json();
                         
-                        // For the frontend dummy SDK, we pass a dummy ID or use actions.order.create
-                        // Since we are using the 'test' client-id, we must create the order client-side to satisfy the SDK UI,
-                        // but we will record it via our backend.
+                        // Create the order client-side for the test SDK UI, but record via backend
                         return actions.order.create({
                             purchase_units: [{
                                 amount: {

@@ -6,10 +6,7 @@ router.post('/create-paypal-order', async (req, res) => {
     try {
         const { productId } = req.body;
         
-        // In a production environment, we would securely fetch the product price from the DB here
-        // and make an authenticated call to PayPal's REST API.
-        // As per the assessment brief, this is a simulated dummy process using Sandbox rules.
-        
+        // Generate dummy order for sandbox testing
         const dummyOrderId = "PAYPAL_TEST_" + Math.floor(Math.random() * 1000000000);
         
         res.status(200).json({ id: dummyOrderId });
@@ -24,9 +21,7 @@ router.post('/capture-paypal-order', async (req, res) => {
     try {
         const { orderID } = req.body;
         
-        // In a real environment, we would call PayPal to execute/capture the transaction.
-        // Here, we simulate a successful transaction capture.
-        
+        // Simulate successful capture
         const mockCaptureResponse = {
             id: orderID,
             status: 'COMPLETED',
