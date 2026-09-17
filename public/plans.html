@@ -81,15 +81,40 @@
                 products.forEach(product => {
                     const card = document.createElement('div');
                     card.className = 'product-card';
+                    card.style.display = 'flex';
+                    card.style.flexDirection = 'column';
+                    card.style.justifyContent = 'space-between';
+                    
+                    let featureDetails = '';
+                    if (product.name === 'Starter') {
+                        featureDetails = '<li>Includes Raw `vless://` strings</li><li>Manual entry required</li><li>Best for basic legacy clients</li>';
+                    } else if (product.name === 'Standard') {
+                        featureDetails = '<li>Everything in Starter</li><li><strong>Base64 Subscription:</strong> Auto-updates your node list dynamically in v2rayNG/Nekobox without manual pasting.</li>';
+                    } else if (product.name === 'Advanced') {
+                        featureDetails = '<li>Everything in Standard</li><li><strong>Sing-box JSON:</strong> Grants access to TLS Fragmentation (len: 10-20) to mask your handshake from SNI DPI firewalls.</li>';
+                    } else if (product.name === 'Complete') {
+                        featureDetails = '<li>Everything in Advanced</li><li><strong>Clash Meta YAML:</strong> Automated load balancing across Clean IPs, built-in ad-blocking rulesets, and intelligent routing.</li>';
+                    }
+
                     card.innerHTML = `
-                        <h4>${product.name}</h4>
-                        <div class="price">$${product.price}</div>
-                        <p>${product.description}</p>
-                        <ul style="border-top: 1px solid #eee; margin-top: 1rem; padding-top: 1rem;">
-                            <li><strong>Tier:</strong> ${product.tier}</li>
-                            <li><strong>Formats:</strong> ${product.bandwidthLimit}</li>
-                        </ul>
-                        <button class="btn btn-buy" onclick="window.location.href='product.html?id=${product._id}'">View Plan & Purchase</button>
+                        <div>
+                            <h4 style="font-size: 1.5rem; color: #2c3e50; margin-bottom: 0.5rem;">${product.name}</h4>
+                            <div style="font-size: 0.9rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">${product.tier}</div>
+                            
+                            <div class="price" style="font-size: 2.5rem; font-weight: bold; color: #27ae60; margin-bottom: 1.5rem;">$${product.price}</div>
+                            
+                            <p style="margin-bottom: 1.5rem; color: #34495e; line-height: 1.5;">${product.description}</p>
+                            
+                            <!-- Interactive Expansion -->
+                            <details style="text-align: left; background: #f8f9fa; padding: 1rem; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 1.5rem; cursor: pointer;">
+                                <summary style="font-weight: bold; color: #2980b9; outline: none;">View Format Specs</summary>
+                                <ul style="margin-top: 1rem; padding-left: 1.5rem; font-size: 0.9rem; color: #555; line-height: 1.6;">
+                                    ${featureDetails}
+                                </ul>
+                            </details>
+                        </div>
+                        
+                        <button class="btn btn-buy" style="width: 100%; margin-top: auto;" onclick="window.location.href='product.html?id=${product._id}'">Select ${product.name}</button>
                     `;
                     productList.appendChild(card);
                 });

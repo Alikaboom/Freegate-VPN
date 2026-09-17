@@ -51,10 +51,13 @@
                     <h2>${product.name}</h2>
                     <div class="price">$${product.price}</div>
                     <p>${product.description}</p>
-                    <ul style="margin: 2rem 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 1.5rem 0;">
-                        <li><strong>Service Tier:</strong> ${product.tier}</li>
-                        <li><strong>Subscription Formats:</strong> ${product.bandwidthLimit}</li>
-                    </ul>
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 2rem 0; border: 1px solid #eee;">
+                        <h4 style="margin-bottom: 0.5rem; color: #2c3e50;">Package Inclusions</h4>
+                        <ul style="padding-left: 1.5rem; color: #555; line-height: 1.6;">
+                            <li><strong>Focus:</strong> ${product.tier}</li>
+                            <li><strong>Formats Unlocked:</strong> ${product.bandwidthLimit}</li>
+                        </ul>
+                    </div>
                     <div id="paypal-button-container" style="margin-top: 2rem;"></div>
                     <div id="payment-success" style="display: none; color: #27ae60; font-weight: bold; margin-top: 1rem;">
                         Payment Successful! Provisioning VPN configuration...
