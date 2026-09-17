@@ -20,7 +20,7 @@ router.post('/capture-paypal-order', async (req, res) => {
         const customerEmail = 'test-buyer@sandbox.paypal.com';
         const vpnUuid = crypto.randomUUID();
         
-        const vpnConfig = `vless://${vpnUuid}@us1.freegate-nodes.com:443?encryption=none&security=tls&type=ws&host=us1.freegate-nodes.com&path=%2F#Freegate-${orderID.substring(0,6)}`;
+        const vpnConfig = `vless://${vpnUuid}@us1.freegate-nodes.com:443?encryption=none&security=tls&sni=us1.freegate-nodes.com&type=ws&host=us1.freegate-nodes.com&path=%2F#Freegate-${orderID.substring(0,6)}`;
 
         // Sync with Cloudflare KV (BPB Panel backend mock)
         console.log(`[CF-KV] Synced UUID ${vpnUuid} for Order ${orderID}`);

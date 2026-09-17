@@ -12,8 +12,7 @@ router.get('/:uuid', async (req, res) => {
             return res.status(404).send('Subscription not found or expired.');
         }
 
-        // I'm generating a valid VLESS URI format using a mock Cloudflare IP
-        const vlessUri = `vless://${uuid}@104.21.94.80:443?encryption=none&security=tls&type=ws&host=my-worker.workers.dev&path=%2F#Freegate-Node`;
+        const vlessUri = `vless://${uuid}@104.21.94.80:443?encryption=none&security=tls&sni=my-worker.workers.dev&type=ws&host=my-worker.workers.dev&path=%2F#Freegate-Node\n`;
 
         const base64Content = Buffer.from(vlessUri).toString('base64');
         

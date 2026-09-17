@@ -57,8 +57,9 @@
                         </ul>
                     </div>
                     <div id="paypal-button-container" style="margin-top: 2rem;"></div>
-                    <div id="payment-success" style="display: none; color: #27ae60; font-weight: bold; margin-top: 1rem;">
-                        Payment Successful! Provisioning VPN configuration...
+                    <div id="payment-success" style="display: none; color: #27ae60; font-weight: bold; margin-top: 1rem;"></div>
+                    <div id="payment-error" style="display: none; color: #e74c3c; font-weight: bold; margin-top: 1rem; padding: 1rem; border: 1px solid #e74c3c; border-radius: 4px; background: #fdf2f0;">
+                        Transaction failed or was cancelled. Please try again.
                     </div>
                 `;
 
@@ -74,7 +75,7 @@
                         return actions.order.create({
                             purchase_units: [{
                                 amount: {
-                                    value: product.price.toString()
+                                    value: parseFloat(product.price).toFixed(2)
                                 }
                             }]
                         });
@@ -110,6 +111,16 @@
                                 window.location.href = 'history.html';
                             }, 6000);
                         }
+                    },
+                    onCancel: function (data) {
+                        document.getElementById('payment-error').style.display = 'block';
+                        document.getElementById('payment-error').innerText = 'Transaction was cancelled by the user. Please try again.';
+                        document.getElementById('payment-success').style.display = 'none';
+                    },
+                    onError: function (err) {
+                        document.getElementById('payment-error').style.display = 'block';
+                        document.getElementById('payment-error').innerText = 'A network or processing error occurred. Please try checking out again.';
+                        document.getElementById('payment-success').style.display = 'none';
                     }
                 }).render('#paypal-button-container');
 
