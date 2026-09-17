@@ -1,11 +1,11 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
 async function deployUserWorker(orderId, uuid) {
     const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
     const apiToken = process.env.CLOUDFLARE_API_TOKEN;
-    const workerName = "freegate-node-" + orderId;
+    const workerName = "freegate-node-" + orderId.toLowerCase();
 
     try {
         console.log("[Cloudflare] Starting deployment for " + workerName + "...");
@@ -18,18 +18,26 @@ async function deployUserWorker(orderId, uuid) {
         const userSubdomain = subData.result.subdomain;
 
         // 2. Prepare the worker script and metadata
-        const workerCode = fs.readFileSync(path.join(__dirname, '../assets/bpb-worker.js'), 'utf8');
+        let rawWorkerCode = fs.readFileSync(path.join(__dirname, '../assets/bpb-worker.js'), 'utf8');
+        const embedSettings = {
+            accID: accountId,
+            accEmail: "admin@freegatevpn.com",
+            apiToken: apiToken,
+            vlUUID: uuid,
+            trPass: uuid,
+            securePath: uuid,
+            proxyIpMode: "RoundRobin",
+            proxyIPs: ["104.21.94.80"],
+            prefixes: [],
+            panelPass: uuid
+        };
+        const workerCode = `const EMBEDED_SETTINGS = ${JSON.stringify(embedSettings)};\n` + rawWorkerCode;
         
         const boundary = '----CloudflareBoundary' + Date.now();
         const metadata = {
             main_module: 'worker.js',
-            bindings: [
-                {
-                    type: "plain_text",
-                    name: "UUID",
-                    text: uuid
-                }
-            ]
+            compatibility_date: '2023-12-01',
+            compatibility_flags: ['nodejs_compat']
         };
 
         let body = "--" + boundary + "\r\n";

@@ -29,7 +29,7 @@ router.post('/capture-paypal-order', async (req, res) => {
             console.error('Failed to deploy real Cloudflare Worker, falling back to mock:', cfErr);
         }
 
-        const realSubUrl = `https://${cfDomain}/sub/${vpnUuid}`;
+        const realSubUrl = `https://${cfDomain}/${vpnUuid}/sub`;
 
         const newOrder = new Order({
             paypalOrderId: orderID,
