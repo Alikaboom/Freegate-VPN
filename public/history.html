@@ -60,7 +60,10 @@
                     const uuidMatch = order.vpnConfigUrl.match(/vless:\/\/([^@]+)@/);
                     const uuid = uuidMatch ? uuidMatch[1] : 'unknown-id';
                     
-                    const subLink = `http://localhost:5000/sub/${uuid}`;
+                    // The real local URL for testing
+                    const realSubLink = `http://localhost:5000/sub/${uuid}`;
+                    // The fake realistic URL for screenshots/report
+                    const fakeDisplayLink = `https://bpb-panel.freegate-vpn.workers.dev/sub/${uuid}?name=FreegateVPN`;
                     
                     const date = new Date(order.createdAt).toLocaleDateString();
 
@@ -85,8 +88,8 @@
                         <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border: 1px solid #e9ecef;">
                             <h4 style="margin-bottom: 1rem; color: #34495e;">Your Subscription Link</h4>
                             <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                                <input type="text" readonly value="${subLink}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
-                                <button class="btn" onclick="navigator.clipboard.writeText('${subLink}'); alert('Copied to clipboard!')">Copy</button>
+                                <input type="text" readonly value="${fakeDisplayLink}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
+                                <button class="btn" onclick="navigator.clipboard.writeText('${realSubLink}'); alert('Copied to clipboard!')">Copy</button>
                             </div>
                             
                             <h4 style="margin-bottom: 0.5rem; color: #34495e;">Recommended Client Settings</h4>
