@@ -29,9 +29,14 @@ async function deployUserWorker(orderId, uuid) {
             proxyIpMode: "RoundRobin",
             proxyIPs: ["104.21.94.80"],
             prefixes: [],
-            panelPass: uuid
+            panelPass: uuid,
+            mainDomain: "",
+            fallback: "https://www.speedtest.net",
+            dohUrl: "https://cloudflare-dns.com/dns-query"
         };
-        const workerCode = `const EMBEDED_SETTINGS = ${JSON.stringify(embedSettings)};\n` + rawWorkerCode;
+        const kvMock = `t.kv = t.kv || { store: new Map(), get: async (k, opts) => { let val = t.kv.store.get(k); if (!val) return null; if (opts && opts.type === 'json') return JSON.parse(val); return val; }, put: async (k, v) => t.kv.store.set(k, v) };`;
+        let workerCode = `Object.assign(globalThis, { EMBEDED_SETTINGS: ${JSON.stringify(embedSettings)} });\n` + rawWorkerCode;
+        workerCode = workerCode.replace('var Zi={async fetch(e,t){', 'var Zi={async fetch(e,t){' + kvMock);
         
         const boundary = '----CloudflareBoundary' + Date.now();
         const metadata = {

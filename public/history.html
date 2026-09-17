@@ -92,13 +92,13 @@
                                     let linksHtml = '';
                                     const productName = order.productId ? order.productId.name : 'Legacy Plan';
                                     
-                                    const addLink = (title, url) => \`
-                                        <h4 style="margin-bottom: 0.5rem; color: #34495e; font-size: 0.9rem;">\${title}</h4>
+                                    const addLink = (title, url) => `
+                                        <h4 style="margin-bottom: 0.5rem; color: #34495e; font-size: 0.9rem;">${title}</h4>
                                         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                                            <input type="text" readonly value="\${url}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
-                                            <button class="btn" onclick="navigator.clipboard.writeText('\${url}'); alert('Copied to clipboard!')">Copy</button>
+                                            <input type="text" readonly value="${url}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
+                                            <button class="btn" onclick="navigator.clipboard.writeText('${url}'); alert('Copied to clipboard!')">Copy</button>
                                         </div>
-                                    \`;
+                                    `;
 
                                     linksHtml += addLink('Raw VLESS Link (Starter)', baseConfigUrl + '?format=raw');
                                     
