@@ -56,6 +56,12 @@
         </div>
     </main>
     <script>
+        const pin = prompt("Enter Admin PIN to access this page:");
+        if (pin !== "1234") {
+            alert("Unauthorized access.");
+            window.location.href = "index.html";
+        }
+
         document.getElementById('add-product-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const statusMsg = document.getElementById('status-msg');
