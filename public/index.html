@@ -31,6 +31,11 @@
 
         <section id="products-section" class="container">
             <h3>Our VPN Plans</h3>
+            
+            <div class="search-container" style="text-align: center; margin-bottom: 2rem;">
+                <input type="text" id="search-input" placeholder="Search plans (e.g. Basic, Pro)..." style="padding: 0.75rem; width: 100%; max-width: 400px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 1rem; padding-left: 1.5rem; transition: border-color 0.3s;">
+            </div>
+
             <!-- This container will be populated dynamically via JavaScript -->
             <div class="product-grid" id="product-list">
                 <p class="loading-text">Loading secure plans...</p>
@@ -45,18 +50,38 @@
     </footer>
 
     <script>
-        // Simple vanilla JS to fetch and display products
+        // Simple vanilla JS to fetch, display, and filter products
+        let allProducts = [];
+
         document.addEventListener('DOMContentLoaded', async () => {
             const productList = document.getElementById('product-list');
+            const searchInput = document.getElementById('search-input');
             
             try {
                 const response = await fetch('/api/products');
                 if (!response.ok) throw new Error('Failed to fetch products');
                 
-                const products = await response.json();
-                
+                allProducts = await response.json();
+                renderProducts(allProducts);
+
+                // Add search listener
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    const filtered = allProducts.filter(p => 
+                        p.name.toLowerCase().includes(term) || 
+                        p.description.toLowerCase().includes(term) ||
+                        p.tier.toLowerCase().includes(term)
+                    );
+                    renderProducts(filtered);
+                });
+
+            } catch (err) {
+                productList.innerHTML = '<p class="error">Error loading products. Please try again.</p>';
+            }
+
+            function renderProducts(products) {
                 if (products.length === 0) {
-                    productList.innerHTML = '<p>No plans available at the moment. Please check back later!</p>';
+                    productList.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">No plans match your search.</p>';
                     return;
                 }
 
@@ -77,8 +102,6 @@
                     `;
                     productList.appendChild(card);
                 });
-            } catch (err) {
-                productList.innerHTML = '<p class="error">Error loading products. Make sure the database is running.</p>';
             }
         });
     </script>
