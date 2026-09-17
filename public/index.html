@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freegate VPN</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <h1>Freegate VPN</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#products-section">Products</a></li>
+                    <li><a href="history.html">Order History</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h2>Secure, Fast, and Unrestricted Internet</h2>
+                <p>Welcome to Freegate VPN. Get encrypted access to the internet with high-speed proxy services designed for your privacy.</p>
+                <a href="#products-section" class="btn">View Plans</a>
+            </div>
+        </section>
+
+        <section id="products-section" class="container">
+            <h3>Our VPN Plans</h3>
+            <!-- This container will be populated dynamically via JavaScript -->
+            <div class="product-grid" id="product-list">
+                <p class="loading-text">Loading secure plans...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Freegate VPN - Final Project B204.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple vanilla JS to fetch and display products
+        document.addEventListener('DOMContentLoaded', async () => {
+            const productList = document.getElementById('product-list');
+            
+            try {
+                const response = await fetch('/api/products');
+                if (!response.ok) throw new Error('Failed to fetch products');
+                
+                const products = await response.json();
+                
+                if (products.length === 0) {
+                    productList.innerHTML = '<p>No plans available at the moment. Please check back later!</p>';
+                    return;
+                }
+
+                productList.innerHTML = ''; // Clear loading text
+
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <h4>${product.name}</h4>
+                        <div class="price">$${product.price}</div>
+                        <p>${product.description}</p>
+                        <ul>
+                            <li><strong>Tier:</strong> ${product.tier}</li>
+                            <li><strong>Bandwidth:</strong> ${product.bandwidthLimit}</li>
+                        </ul>
+                        <button class="btn btn-buy" onclick="alert('Checkout feature coming in Phase 2!')">Purchase Plan</button>
+                    `;
+                    productList.appendChild(card);
+                });
+            } catch (err) {
+                productList.innerHTML = '<p class="error">Error loading products. Make sure the database is running.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

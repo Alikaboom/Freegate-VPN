@@ -12,6 +12,10 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static frontend files from the public folder
 app.use(express.static('public'));
 
+// Routes
+const productRoutes = require('./routes/productRoutes');
+app.use('/api/products', productRoutes);
+
 // Database connection with retry logic
 const connectDB = async () => {
     try {
