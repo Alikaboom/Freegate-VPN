@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - Freegate VPN</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <h1>Freegate VPN</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="plans.html">Products</a></li>
+                    <li><a href="history.html">Order History</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 0; max-width: 600px;">
+        <h2 style="margin-bottom: 2rem; color: #2c3e50;">Add New VPN Plan</h2>
+        
+        <div class="product-card" style="text-align: left;">
+            <form id="add-product-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div>
+                    <label style="font-weight: bold; margin-bottom: 0.5rem; display: block;">Plan Name</label>
+                    <input type="text" id="name" required style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                
+                <div>
+                    <label style="font-weight: bold; margin-bottom: 0.5rem; display: block;">Description</label>
+                    <textarea id="desc" required rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+                </div>
+                
+                <div>
+                    <label style="font-weight: bold; margin-bottom: 0.5rem; display: block;">Price ($)</label>
+                    <input type="number" id="price" required min="1" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                
+                <div>
+                    <label style="font-weight: bold; margin-bottom: 0.5rem; display: block;">Tier Level (e.g. Basic, Pro)</label>
+                    <input type="text" id="tier" required style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                
+                <div>
+                    <label style="font-weight: bold; margin-bottom: 0.5rem; display: block;">Bandwidth/Format Limit</label>
+                    <input type="text" id="bandwidth" required placeholder="e.g. Raw VLESS only" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                
+                <button type="submit" class="btn" style="margin-top: 1rem;">Save Product</button>
+            </form>
+            <p id="status-msg" style="margin-top: 1rem; font-weight: bold;"></p>
+        </div>
+    </main>
+</body>
+</html>
