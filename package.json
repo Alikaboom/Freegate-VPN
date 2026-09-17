@@ -1,0 +1,15 @@
+{
+  "name": "freegate-vpn",
+  "version": "1.0.0",
+  "description": "Simple VPN e-commerce storefront for B204",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
