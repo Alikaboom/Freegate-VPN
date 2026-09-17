@@ -13,7 +13,7 @@
             <nav>
                 <ul>
                     <li><a href="index.html">Home</a></li>
-                    <li><a href="index.html#products-section">Products</a></li>
+                    <li><a href="plans.html">Products</a></li>
                     <li><a href="history.html">Order History</a></li>
                 </ul>
             </nav>
@@ -48,7 +48,7 @@
                     ordersContainer.innerHTML = `
                         <div class="product-card" style="text-align: center;">
                             <p>You haven't purchased any VPN plans yet.</p>
-                            <a href="index.html#products-section" class="btn" style="margin-top: 1rem;">View Plans</a>
+                            <a href="plans.html" class="btn" style="margin-top: 1rem;">View Plans</a>
                         </div>
                     `;
                     return;
@@ -57,10 +57,11 @@
                 ordersContainer.innerHTML = ''; // Clear loading
 
                 orders.forEach(order => {
-                    // Extract the UUID from the VLESS link to construct a realistic BPB Subscription URL
                     const uuidMatch = order.vpnConfigUrl.match(/vless:\/\/([^@]+)@/);
                     const uuid = uuidMatch ? uuidMatch[1] : 'unknown-id';
-                    const subLink = `https://us1.freegate-nodes.com/sub/${uuid}`;
+                    
+                    // Point to our local mock server so the V2ray client can successfully fetch the Base64!
+                    const subLink = `http://localhost:5000/sub/${uuid}`;
                     
                     const date = new Date(order.createdAt).toLocaleDateString();
 

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Plans - Freegate</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <h1>Freegate VPN</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="plans.html">Products</a></li>
+                    <li><a href="history.html">Order History</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="products-section" class="container" style="padding: 4rem 0;">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 1rem;">Choose Your BPB-Panel Tier</h2>
+            <p style="text-align: center; color: #7f8c8d; margin-bottom: 2rem;">Unlock advanced formats and fragmentation settings as you upgrade.</p>
+            
+            <div class="search-container" style="text-align: center; margin-bottom: 3rem;">
+                <input type="text" id="search-input" placeholder="Search plans (e.g. Basic, Pro)..." style="padding: 0.75rem; width: 100%; max-width: 400px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 1rem; padding-left: 1.5rem; transition: border-color 0.3s;">
+            </div>
+
+            <div class="product-grid" id="product-list">
+                <p class="loading-text">Loading secure tiers...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Freegate VPN - Final Project B204.</p>
+        </div>
+    </footer>
+
+    <script>
+        let allProducts = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const productList = document.getElementById('product-list');
+            const searchInput = document.getElementById('search-input');
+            
+            try {
+                // To clear cache issues
+                const response = await fetch('/api/products?t=' + new Date().getTime());
+                if (!response.ok) throw new Error('Failed to fetch products');
+                
+                allProducts = await response.json();
+                renderProducts(allProducts);
+
+                searchInput.addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    const filtered = allProducts.filter(p => 
+                        p.name.toLowerCase().includes(term) || 
+                        p.description.toLowerCase().includes(term) ||
+                        p.tier.toLowerCase().includes(term)
+                    );
+                    renderProducts(filtered);
+                });
+
+            } catch (err) {
+                productList.innerHTML = '<p class="error">Error loading products. Please try again.</p>';
+            }
+
+            function renderProducts(products) {
+                if (products.length === 0) {
+                    productList.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">No plans match your search.</p>';
+                    return;
+                }
+
+                productList.innerHTML = ''; 
+
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <h4>${product.name}</h4>
+                        <div class="price">$${product.price}</div>
+                        <p>${product.description}</p>
+                        <ul style="border-top: 1px solid #eee; margin-top: 1rem; padding-top: 1rem;">
+                            <li><strong>Tier:</strong> ${product.tier}</li>
+                            <li><strong>Formats:</strong> ${product.bandwidthLimit}</li>
+                        </ul>
+                        <button class="btn btn-buy" onclick="window.location.href='product.html?id=${product._id}'">View Plan & Purchase</button>
+                    `;
+                    productList.appendChild(card);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
