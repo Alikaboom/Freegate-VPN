@@ -14,7 +14,10 @@ app.use(express.static('public'));
 
 // Routes
 const productRoutes = require('./routes/productRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+
 app.use('/api/products', productRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // Database connection with retry logic
 const connectDB = async () => {

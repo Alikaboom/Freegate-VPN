@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Details - Freegate VPN</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Load PayPal Sandbox SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <h1>Freegate VPN</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#products-section">Products</a></li>
+                    <li><a href="history.html">Order History</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container" style="padding: 4rem 0;">
+        <div id="product-details" class="product-card" style="max-width: 600px; margin: 0 auto;">
+            <p class="loading-text">Loading plan details...</p>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const detailsContainer = document.getElementById('product-details');
+
+            if (!productId) {
+                detailsContainer.innerHTML = '<p class="error">No product ID provided.</p>';
+                return;
+            }
+
+            try {
+                // Fetch product details from the backend
+                const response = await fetch(`/api/products/${productId}`);
+                if (!response.ok) throw new Error('Product not found');
+                
+                const product = await response.json();
+
+                // Render product details
+                detailsContainer.innerHTML = `
+                    <h2>${product.name}</h2>
+                    <div class="price">$${product.price}</div>
+                    <p>${product.description}</p>
+                    <ul style="margin: 2rem 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 1.5rem 0;">
+                        <li><strong>Service Tier:</strong> ${product.tier}</li>
+                        <li><strong>Bandwidth Limit:</strong> ${product.bandwidthLimit}</li>
+                    </ul>
+                    <div id="paypal-button-container" style="margin-top: 2rem;"></div>
+                    <div id="payment-success" style="display: none; color: #27ae60; font-weight: bold; margin-top: 1rem;">
+                        Payment Successful! Provisioning VPN configuration...
+                    </div>
+                `;
+
+                // Render PayPal Button
+                paypal.Buttons({
+                    createOrder: async (data, actions) => {
+                        // Call our backend to create a dummy order
+                        const res = await fetch('/api/payments/create-paypal-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId: product._id })
+                        });
+                        const orderData = await res.json();
+                        
+                        // For the frontend dummy SDK, we pass a dummy ID or use actions.order.create
+                        // Since we are using the 'test' client-id, we must create the order client-side to satisfy the SDK UI,
+                        // but we will record it via our backend.
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: product.price.toString()
+                                }
+                            }]
+                        });
+                    },
+                    onApprove: async (data, actions) => {
+                        // Capture the order client-side to satisfy the 'test' SDK UI
+                        const details = await actions.order.capture();
+                        
+                        // Call our backend to simulate the capture and hook into BPB-Worker
+                        const res = await fetch('/api/payments/capture-paypal-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ orderID: details.id })
+                        });
+                        const captureResult = await res.json();
+
+                        if (captureResult.status === 'COMPLETED') {
+                            document.getElementById('paypal-button-container').style.display = 'none';
+                            document.getElementById('payment-success').style.display = 'block';
+                            
+                            // Redirect to history page after 3 seconds
+                            setTimeout(() => {
+                                window.location.href = 'history.html';
+                            }, 3000);
+                        }
+                    }
+                }).render('#paypal-button-container');
+
+            } catch (err) {
+                detailsContainer.innerHTML = '<p class="error">Failed to load product details.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

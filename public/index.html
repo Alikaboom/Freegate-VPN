@@ -73,7 +73,7 @@
                             <li><strong>Tier:</strong> ${product.tier}</li>
                             <li><strong>Bandwidth:</strong> ${product.bandwidthLimit}</li>
                         </ul>
-                        <button class="btn btn-buy" onclick="alert('Checkout feature coming in Phase 2!')">Purchase Plan</button>
+                        <button class="btn btn-buy" onclick="window.location.href='product.html?id=${product._id}'">View Plan & Purchase</button>
                     `;
                     productList.appendChild(card);
                 });
