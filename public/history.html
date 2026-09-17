@@ -86,10 +86,33 @@
                         </div>
                         
                         <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border: 1px solid #e9ecef;">
-                            <h4 style="margin-bottom: 1rem; color: #34495e;">Your Subscription Link</h4>
-                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                                <input type="text" readonly value="${fakeDisplayLink}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
-                                <button class="btn" onclick="navigator.clipboard.writeText('${realSubLink}'); alert('Copied to clipboard!')">Copy</button>
+                            <div class="links-container" style="margin-bottom: 1.5rem;">
+                                ${(() => {
+                                    let linksHtml = '';
+                                    const productName = order.productId ? order.productId.name : 'Legacy Plan';
+                                    
+                                    const addLink = (title, displayUrl, realUrl) => `
+                                        <h4 style="margin-bottom: 0.5rem; color: #34495e; font-size: 0.9rem;">${title}</h4>
+                                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                                            <input type="text" readonly value="${displayUrl}" style="flex: 1; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace;">
+                                            <button class="btn" onclick="navigator.clipboard.writeText('${realUrl}'); alert('Copied to clipboard!')">Copy</button>
+                                        </div>
+                                    `;
+
+                                    linksHtml += addLink('Raw VLESS Link (Starter)', fakeDisplayLink + '&type=raw', realSubLink + '?type=raw');
+                                    
+                                    if (['Standard', 'Advanced', 'Complete'].includes(productName)) {
+                                        linksHtml += addLink('Base64 Subscription (Standard)', fakeDisplayLink + '&type=b64', realSubLink + '?type=b64');
+                                    }
+                                    if (['Advanced', 'Complete'].includes(productName)) {
+                                        linksHtml += addLink('Sing-box JSON (Advanced)', fakeDisplayLink + '&type=singbox', realSubLink + '?type=singbox');
+                                    }
+                                    if (['Complete'].includes(productName)) {
+                                        linksHtml += addLink('Clash Meta YAML (Complete)', fakeDisplayLink + '&type=clash', realSubLink + '?type=clash');
+                                    }
+                                    
+                                    return linksHtml;
+                                })()}
                             </div>
                             
                             <h4 style="margin-bottom: 0.5rem; color: #34495e;">Recommended Client Settings</h4>

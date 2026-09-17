@@ -14,22 +14,28 @@ router.post('/create-paypal-order', async (req, res) => {
     }
 });
 
+const { deployUserWorker } = require('../services/cloudflare');
+
 router.post('/capture-paypal-order', async (req, res) => {
     try {
         const { orderID, productId } = req.body;
         const customerEmail = 'test-buyer@sandbox.paypal.com';
         const vpnUuid = crypto.randomUUID();
         
-        const vpnConfig = `vless://${vpnUuid}@us1.freegate-nodes.com:443?encryption=none&security=tls&sni=us1.freegate-nodes.com&type=ws&host=us1.freegate-nodes.com&path=%2F#Freegate-${orderID.substring(0,6)}`;
+        let cfDomain = 'fallback-domain.workers.dev';
+        try {
+            cfDomain = await deployUserWorker(orderID, vpnUuid);
+        } catch (cfErr) {
+            console.error('Failed to deploy real Cloudflare Worker, falling back to mock:', cfErr);
+        }
 
-        // Sync with Cloudflare KV (BPB Panel backend mock)
-        console.log(`[CF-KV] Synced UUID ${vpnUuid} for Order ${orderID}`);
+        const realSubUrl = `https://${cfDomain}/sub/${vpnUuid}`;
 
         const newOrder = new Order({
             paypalOrderId: orderID,
             productId: productId,
             customerEmail: customerEmail,
-            vpnConfigUrl: vpnConfig
+            vpnConfigUrl: realSubUrl
         });
 
         await newOrder.save();
@@ -37,7 +43,7 @@ router.post('/capture-paypal-order', async (req, res) => {
         res.status(200).json({
             id: orderID,
             status: 'COMPLETED',
-            configUrl: vpnConfig
+            configUrl: realSubUrl
         });
     } catch (err) {
         console.error('Error provisioning VPN:', err);
