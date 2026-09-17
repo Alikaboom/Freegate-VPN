@@ -40,13 +40,11 @@
             }
 
             try {
-                // Fetch product details from the backend
                 const response = await fetch(`/api/products/${productId}`);
                 if (!response.ok) throw new Error('Product not found');
                 
                 const product = await response.json();
 
-                // Render product details
                 detailsContainer.innerHTML = `
                     <h2>${product.name}</h2>
                     <div class="price">$${product.price}</div>
@@ -64,10 +62,8 @@
                     </div>
                 `;
 
-                // Render PayPal Button
                 paypal.Buttons({
                     createOrder: async (data, actions) => {
-                        // Call our backend to create a dummy order
                         const res = await fetch('/api/payments/create-paypal-order', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -75,7 +71,6 @@
                         });
                         const orderData = await res.json();
                         
-                        // Create the order client-side for the test SDK UI, but record via backend
                         return actions.order.create({
                             purchase_units: [{
                                 amount: {
@@ -85,10 +80,8 @@
                         });
                     },
                     onApprove: async (data, actions) => {
-                        // Capture the order client-side to satisfy the 'test' SDK UI
                         const details = await actions.order.capture();
                         
-                        // Call our backend to simulate the capture and hook into BPB-Worker
                         const res = await fetch('/api/payments/capture-paypal-order', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -113,7 +106,6 @@
                                 <br><small>Redirecting to your Order History...</small>
                             `;
                             
-                            // Redirect to history page after 6 seconds so they can read it
                             setTimeout(() => {
                                 window.location.href = 'history.html';
                             }, 6000);

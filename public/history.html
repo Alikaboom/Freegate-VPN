@@ -54,13 +54,12 @@
                     return;
                 }
 
-                ordersContainer.innerHTML = ''; // Clear loading
+                ordersContainer.innerHTML = '';
 
                 orders.forEach(order => {
                     const uuidMatch = order.vpnConfigUrl.match(/vless:\/\/([^@]+)@/);
                     const uuid = uuidMatch ? uuidMatch[1] : 'unknown-id';
                     
-                    // Point to our local mock server so the V2ray client can successfully fetch the Base64!
                     const subLink = `http://localhost:5000/sub/${uuid}`;
                     
                     const date = new Date(order.createdAt).toLocaleDateString();

@@ -49,7 +49,6 @@
             const searchInput = document.getElementById('search-input');
             
             try {
-                // To clear cache issues
                 const response = await fetch('/api/products?t=' + new Date().getTime());
                 if (!response.ok) throw new Error('Failed to fetch products');
                 
