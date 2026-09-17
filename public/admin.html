@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -55,5 +55,40 @@
             <p id="status-msg" style="margin-top: 1rem; font-weight: bold;"></p>
         </div>
     </main>
+    <script>
+        document.getElementById('add-product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const statusMsg = document.getElementById('status-msg');
+            statusMsg.style.color = '#333';
+            statusMsg.textContent = 'Saving...';
+
+            const newProduct = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('desc').value,
+                price: parseFloat(document.getElementById('price').value),
+                tier: document.getElementById('tier').value,
+                bandwidthLimit: document.getElementById('bandwidth').value
+            };
+
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newProduct)
+                });
+
+                if (response.ok) {
+                    statusMsg.style.color = '#27ae60';
+                    statusMsg.textContent = 'Product added successfully!';
+                    document.getElementById('add-product-form').reset();
+                } else {
+                    throw new Error('Failed to save');
+                }
+            } catch (err) {
+                statusMsg.style.color = 'red';
+                statusMsg.textContent = 'Error saving product.';
+            }
+        });
+    </script>
 </body>
 </html>
