@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const Order = require('../models/Order');
+const User = require('../models/User');
 
 router.post('/create-paypal-order', async (req, res) => {
     try {
@@ -18,8 +19,19 @@ const { deployUserWorker } = require('../services/cloudflare');
 
 router.post('/capture-paypal-order', async (req, res) => {
     try {
-        const { orderID, productId } = req.body;
-        const customerEmail = 'test-buyer@sandbox.paypal.com';
+        const { orderID, productId, email, name } = req.body;
+        const customerEmail = email || 'test-buyer@sandbox.paypal.com';
+        const customerName = name || 'Sandbox Buyer';
+        
+        let user = await User.findOne({ email: customerEmail });
+        if (!user) {
+            user = new User({ name: customerName, email: customerEmail });
+        }
+        if (!user.plans.includes(productId)) {
+            user.plans.push(productId);
+        }
+        await user.save();
+
         const vpnUuid = crypto.randomUUID();
         
         let cfDomain = 'fallback-domain.workers.dev';
