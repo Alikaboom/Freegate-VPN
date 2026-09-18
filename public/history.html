@@ -23,7 +23,14 @@
     <main class="container" style="padding: 4rem 0; min-height: 70vh;">
         <h2 style="margin-bottom: 2rem; color: #2c3e50;">Your Subscriptions</h2>
         
-        <div id="orders-container">
+        <div id="login-container" class="product-card" style="text-align: center; max-width: 500px; margin: 0 auto 2rem auto;">
+            <p style="margin-bottom: 1rem;">Enter your PayPal email to view your active VPN plans.</p>
+            <input type="email" id="user-email" placeholder="Email Address" style="padding: 0.75rem; width: 80%; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 4px;">
+            <br>
+            <button id="fetch-orders-btn" class="btn">View Orders</button>
+        </div>
+
+        <div id="orders-container" style="display: none;">
             <p class="loading-text">Loading your order history...</p>
         </div>
     </main>
@@ -35,11 +42,19 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('fetch-orders-btn').addEventListener('click', async () => {
+            const email = document.getElementById('user-email').value.trim();
+            if (!email) return alert('Please enter your email.');
+
+            const loginContainer = document.getElementById('login-container');
             const ordersContainer = document.getElementById('orders-container');
+            
+            loginContainer.style.display = 'none';
+            ordersContainer.style.display = 'block';
+            ordersContainer.innerHTML = '<p class="loading-text">Loading your order history...</p>';
 
             try {
-                const response = await fetch('/api/orders');
+                const response = await fetch('/api/orders?email=' + encodeURIComponent(email));
                 if (!response.ok) throw new Error('Failed to fetch orders');
                 
                 const orders = await response.json();
@@ -47,7 +62,7 @@
                 if (orders.length === 0) {
                     ordersContainer.innerHTML = `
                         <div class="product-card" style="text-align: center;">
-                            <p>You haven't purchased any VPN plans yet.</p>
+                            <p>We couldn't find any VPN plans linked to <strong>${email}</strong>.</p>
                             <a href="plans.html" class="btn" style="margin-top: 1rem;">View Plans</a>
                         </div>
                     `;
@@ -59,7 +74,6 @@
                 orders.forEach(order => {
                     let baseConfigUrl = order.vpnConfigUrl;
                     
-                    // Fallback for older orders that still have the legacy vless:// string
                     if (baseConfigUrl.startsWith('vless://')) {
                         const uuidMatch = baseConfigUrl.match(/vless:\/\/([^@]+)@/);
                         const uuid = uuidMatch ? uuidMatch[1] : 'unknown-id';

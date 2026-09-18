@@ -4,9 +4,12 @@ const Order = require('../models/Order');
 
 router.get('/', async (req, res) => {
     try {
-        // In a real app with auth, I would filter by req.user.email
-        // For this assessment, I fetch the dummy buyer's orders
-        const orders = await Order.find({ customerEmail: 'test-buyer@sandbox.paypal.com' })
+        const { email } = req.query;
+        if (!email) {
+            return res.status(200).json([]);
+        }
+
+        const orders = await Order.find({ customerEmail: email })
                                   .populate('productId')
                                   .sort({ createdAt: -1 });
         
