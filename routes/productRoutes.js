@@ -49,4 +49,34 @@ router.post('/', async (req, res) => {
     }
 });
 
+router.put('/:id', async (req, res) => {
+    try {
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id, 
+            req.body, 
+            { new: true }
+        );
+        if (!updatedProduct) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.json(updatedProduct);
+    } catch (err) {
+        console.error('Error updating product:', err);
+        res.status(500).json({ error: 'Server error while updating product' });
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+        if (!deletedProduct) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.json({ message: 'Product deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting product:', err);
+        res.status(500).json({ error: 'Server error while deleting product' });
+    }
+});
+
 module.exports = router;
