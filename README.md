@@ -1,11 +1,47 @@
-# Freegate VPN - B204 Final Project
+Freegate VPN
 
-This repository holds my final submission for the B204 App and Web Development module. I decided to build a mock e-commerce storefront for a VPN service called Freegate. One of the main reasons I chose this topic is my enthusiasm for networking and I wanted a fun challenge instead of just doing a standard shop. I based the core logic around the BPB-Worker-Panel system which uses Cloudflare Workers to bypass firewalls and it was really interesting trying to recreate that backend behavior myself. I also built a custom admin dashboard with a raw database console so I can query MongoDB straight from the browser.
+This project is created as an example of a simple e-commerce web app where the clients can browse and buy the mock subscriptions for VPN services. It works as a virtual store that connects to the backend for simulating digital product fulfillment.
 
-The site itself is a storefront where you can browse four different subscription tiers. I built the entire frontend using plain HTML and CSS and vanilla javascript because the module constraints do not allow heavy frameworks like React. Another important reason for this approach was to really learn the basics from scratch. I implemented a live search bar on the plans page so you can type and it filters the products instantly on the client side. This paired with the PayPal Sandbox SDK means you can actually click to select a plan and go through a fake checkout process to test the flow. Once the fake payment clears my Node backend saves the order into a MongoDB database. Instead of just mocking a fake string, my Node server actually attempts to use the Cloudflare REST API to dynamically deploy a brand new BPB Cloudflare Worker script. However, because of recent KV namespace restrictions on their end, the system safely falls back to a custom Node route that generates a Base64 VLESS subscription link for the user.
+Technological Stack
 
-For the technology stack I used HTML and plain CSS for the frontend. The backend runs on Node and Express and I chose MongoDB with Mongoose for the database. I also wrote a custom API service to interact directly with the Cloudflare network. Everything is containerized with Docker.
+The frontend consists of the HTML, CSS, Vanilla JavaScript technologies. As for backend, it is built using Node.js & Express technologies. MongoDB and Mongoose were chosen to work with the database and the entire solution was dockerized.
 
-Getting the project running is very straightforward. First, you must copy the `.env.example` file and rename it to `.env`, then paste in your own Cloudflare Account ID and API Token (this is required for the backend to spawn workers). Then, you just need to have Docker Desktop running in the background. Open a terminal in this folder and run `docker-compose up -d --build` and then wait a few seconds for the database to connect. After that you can just open your browser and go to localhost on port 5000.
+How To Run The Project
 
-To test the application you can go to the products page and pick any plan. When you click the PayPal button you will need to log in with a fake Sandbox buyer account which you can grab from the PayPal developer dashboard. After you complete the purchase it will automatically redirect you to the order history page. From there you can copy the localhost subscription link and try pasting it into the v2rayN client to see the backend return the config string.
+Setting up the project is really simple. You need to copy the file .env.example, change the name to .env and fill in the necessary credentials for the Cloudflare API Key and Cloudflare Account ID. This step is essential for running the worker logic of the backend part.
+
+Make sure Docker Desktop is running in the background. Open the terminal within this project folder and execute the following command: docker-compose up -d --build
+
+Wait a few seconds for the database connection, after that open a browser and navigate to localhost at 5000 port.
+
+How To Test The Store
+
+First, go to the Products page and choose any of the available VPN subscription. Upon clicking the "PayPal" payment option you will be requested to sign into the Sandbox Buyer account on PayPal developer page. Once the payment is completed you will be automatically redirected to the Orders page where you can grab your subscription link at localhost
+
+Notice, since we were asked to simulate purchasing an item, those generated VLESS links are the dummy configurations used for demo purposes only.
+
+Architectural Overview
+
+In order to facilitate understanding the architecture of the codebase here is the brief overview of the backend part of this solution.
+
+Database Models:
+
+- Product: It stores the details about the particular VPN tier (price, bandwidht etc).
+
+- Order: It saves the Checkout id, the product, the email address and the dummy url with the generated config for the selected product.
+
+- User: This model holds the data about user identity and its email address and the array of all purchased products.
+
+Rest Api Endpoints:
+
+- GET /api/products: Public Catalog of our products.
+
+- POST /api/products: This one is secure endpoint for adding new products.
+
+- POST /api/payments/create-paypal-order: PayPal Sandbox transaction initialization.
+
+- POST /api/payments/capture-paypal-order: Capture the payment, create User entity and simulate deployment logic.
+
+- GET /api/orders?email=... : Retrieve orders history of a particular user with specific email address.
+
+- POST /api/admin/query: Console for the raw database execution for debugging backend routes.
